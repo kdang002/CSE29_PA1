@@ -54,19 +54,27 @@ int32_t getCodePointAsByte(unsigned char c)
 }
 */
 
-
+// This function will return the width of how many bytes a UTF-8 takes up
+// @param: a char 
+// @return: width of how bytes
+//
 int32_t width_from_start_bytes(char start_byte)
 {
-    if (start_byte & 0b10000000 == 0b00000000)
+    //For ASCII, highest order byte is 0b0xxxxxxx
+    if ((start_byte & 0b10000000) == 0b00000000) 
         return 1;
 
-    else if (start_byte & 0b11100000 == 0b11000000)
+    //For 2 bytes, start byte is 0b11xxxxxxx
+    else if ((start_byte & 0b11100000) == 0b11000000)
         return 2;
 
-    else if (start_byte & 0b11110000 == 0b11100000)
+    //SAME THING 
+    else if ((start_byte & 0b11110000) == 0b11100000)
         return 3;
 
-    return -1;
+    //Continuation bytes will always satrt with 0b10xxxxxx
+    else if ((start_byte & 0b11000000) == 0b10000000)
+        return -1;
 }
 
 
