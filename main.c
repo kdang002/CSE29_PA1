@@ -148,7 +148,9 @@ void utf8_substring(char str[], int32_t cpi_start, int32_t cpi_end, char result[
 }
 
 
-
+// Takes a UTF-8 encoded string and a codepoint index, and returns a decimal representing the codepoint at that index.
+// @param: string, codepointindex
+// @return: decimal represent codepoint at index.
 int32_t codepoint_at(char str[], int32_t cpi)
 {
     int codePointIterator = 0;
@@ -160,7 +162,12 @@ int32_t codepoint_at(char str[], int32_t cpi)
         
         if (codePointIterator == cpi)
         {
-            return str[codePointIterator];
+            //CHECK FOR THE CASE WHEN CPI is UTF, DOESN'T RETURN -1
+            if (str[byteIterator] >= 0)
+                return str[byteIterator]; // SHOULD RETURN AT BYTE ITERATOR TO PREVENT WRONG MEMORY.
+
+            else
+                return -1;
         }
 
         if (width == -1)
@@ -172,14 +179,17 @@ int32_t codepoint_at(char str[], int32_t cpi)
         return 0;
 }
 
+char is_animal_emoji_at(char str[], int32_t cpi)
+{
+    
+}
 
 int main()
 {
     char str[] = "Joséph";
-    int32_t idx = 0;
+    int32_t idx = 3;
     //printf("Codepoint index %d is byte index %d\n", idx, codepoint_index_to_byte_index("Joséph", idx));
     printf("Codepoint at %d in %s is %d\n", idx, str, codepoint_at(str, idx)); // 'p' is the 4th codepoint
-
 
     return 0;
 }
