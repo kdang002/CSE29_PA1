@@ -99,6 +99,7 @@ int32_t codepoint_index_to_byte_index(char str[], int32_t cpi)
 {
     int codePointIterator = 0;
     int byteIterator = 0;
+
     while (str[byteIterator] != '\0')
     {
 
@@ -107,48 +108,54 @@ int32_t codepoint_index_to_byte_index(char str[], int32_t cpi)
             return byteIterator;
         }
 
-        if (width_from_start_bytes(str[byteIterator]) == -1)
+        int width = width_from_start_bytes(str[byteIterator]);
+        if (width == -1)
             return -1;
 
-        byteIterator += width_from_start_bytes(str[byteIterator]);
+        byteIterator += width;
         codePointIterator++;
     }
 
-    return 0;
+    return -1;
 }
 
+// This function will convert codepoint_index_to_byte_index
+// @param: UTF-8 string, codepoint index (cpi)
+// @return: int byte index
+// FUNCTIONING PARTIALLY
 void utf8_substring(char str[], int32_t cpi_start, int32_t cpi_end, char result[])
 {
     int byteStart = codepoint_index_to_byte_index(str, cpi_start);
     int byteEnd = codepoint_index_to_byte_index(str, cpi_end);
 
+    printf("BYTE START/END: %d %d \n", byteStart, byteEnd);
+
+
+    if (byteStart == -1 || byteEnd == -1 || byteStart > byteEnd)
+    {
+        return;
+    }
+
     int index = 0;
 
-    for (int i = byteStart; i != byteEnd; i++)
+
+    //This loop will copy the indicated bytes into result[]
+    for (int i = byteStart; i <= byteEnd; i++)
     {
-        //CONCATNATE from cpi_start to cpi_end to result.
         result[index] = str[i];
         index++;
     }
 
     result[index] = '\0';
-
-    /*
-    // RECOMMENDED TO USE WHILE LOOP => EASIER TO KEEP TRACK WITH THE 'i' AND THE "width of bytes".
-
-    while (str[index] != '\0')
-    {
-        if (i )
-        i += width_from_start_bytes(str[i]);
-    }
-    */
 }
+
 
 int main()
 {
     char result[17];
-    utf8_substring("🦀🦮🦮🦀🦀🦮🦮", 3, 7, result);
-    printf("String: %s\nSubstring: %s", result); // these emoji are 4 bytes long
+    //CODE ONLY WORKS UP TO 6(INCLUSION) and breaks at 7(EXCLUSION)
+    utf8_substring("🦀🦮🦮🦀🦀🦮🦮", 3, 6, result); 
+    printf("String: %s \n", result); // these emoji are 4 bytes long
 
 
     //char str[5] = "HAHA";
