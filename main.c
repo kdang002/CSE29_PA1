@@ -130,14 +130,12 @@ void utf8_substring(char str[], int32_t cpi_start, int32_t cpi_end, char result[
 
     printf("BYTE START/END: %d %d \n", byteStart, byteEnd);
 
-
     if (byteStart == -1 || byteEnd == -1 || byteStart > byteEnd)
     {
         return;
     }
 
     int index = 0;
-
 
     //This loop will copy the indicated bytes into result[]
     for (int i = byteStart; i <= byteEnd; i++)
@@ -150,16 +148,38 @@ void utf8_substring(char str[], int32_t cpi_start, int32_t cpi_end, char result[
 }
 
 
+
+int32_t codepoint_at(char str[], int32_t cpi)
+{
+    int codePointIterator = 0;
+    int byteIterator = 0;
+
+    while (str[byteIterator] != '\0')
+    {
+        int width = width_from_start_bytes(str[byteIterator]);
+        
+        if (codePointIterator == cpi)
+        {
+            return str[codePointIterator];
+        }
+
+        if (width == -1)
+            return -1;
+
+        byteIterator += width;
+        codePointIterator++;
+    }
+        return 0;
+}
+
+
 int main()
 {
-    char result[17];
-    //CODE ONLY WORKS UP TO 6(INCLUSION) and breaks at 7(EXCLUSION)
-    utf8_substring("🦀🦮🦮🦀🦀🦮🦮", 3, 6, result); 
-    printf("String: %s \n", result); // these emoji are 4 bytes long
+    char str[] = "Joséph";
+    int32_t idx = 0;
+    //printf("Codepoint index %d is byte index %d\n", idx, codepoint_index_to_byte_index("Joséph", idx));
+    printf("Codepoint at %d in %s is %d\n", idx, str, codepoint_at(str, idx)); // 'p' is the 4th codepoint
 
-
-    //char str[5] = "HAHA";
-    //printf("STRING: %s \n", strcat(result,str));
 
     return 0;
 }
