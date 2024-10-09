@@ -122,7 +122,7 @@ int32_t codepoint_index_to_byte_index(char str[], int32_t cpi)
 // This function will convert codepoint_index_to_byte_index
 // @param: UTF-8 string, codepoint index (cpi)
 // @return: int byte index
-// FUNCTIONING PARTIALLY
+// FUNCTIONING PARTIALLY DUE TO MEMORY LEAK
 void utf8_substring(char str[], int32_t cpi_start, int32_t cpi_end, char result[])
 {
     int byteStart = codepoint_index_to_byte_index(str, cpi_start);
