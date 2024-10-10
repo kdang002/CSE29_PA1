@@ -74,8 +74,6 @@ int32_t width_from_start_bytes(unsigned char start_byte)
     }
 
     return 0;
-    
-
 }
 
 // This function will return the length of the UTF-8 string CORRECTLY
@@ -101,7 +99,7 @@ int32_t utf8_strlen(char str[])
 // @param: UTF-8 string, codepoint index (cpi)
 // @return: int byte index
 //
-int32_t codepoint_index_to_byte_index(char str[], int32_t cpi)
+int32_t codepoint_index_to_byte_index(const char str[], int32_t cpi)
 {
     
     int codePointIterator = 0;
@@ -123,19 +121,18 @@ int32_t codepoint_index_to_byte_index(char str[], int32_t cpi)
     }
 
     return 0;
-    
 }
 
-// This function will convert codepoint_index_to_byte_index
+// This function will return a substring
 // @param: UTF-8 string, codepoint index (cpi)
 // @return: int byte index
 // FUNCTIONING NOW - DUE TO codepoint_index_to_byte_index()
-void utf8_substring(char str[], int32_t cpi_start, int32_t cpi_end, char result[])
+void utf8_substring(const char str[], int32_t cpi_start, int32_t cpi_end, char result[])
 {
     int byteStart = codepoint_index_to_byte_index(str, cpi_start);
     int byteEnd = codepoint_index_to_byte_index(str, cpi_end);
 
-    printf("BYTE START/END: %d %d \n", byteStart, byteEnd);
+    //printf("BYTE START/END: %d %d \n", byteStart, byteEnd);
 
     if (byteStart == -1 || byteEnd == -1)
     {
@@ -283,8 +280,18 @@ int main()
     printf("Valid ASCII: %s\n", is_ascii(input) ? "true" : "false");
 
     //Uppercase
-    capitalize_ascii(input);
-    printf("Uppercased ASCII: %s", input);
+    char capitalInput[strlen(input)];
+    // strcpy(capitalInput, input); // DOESN'T MAKE HARD COPY, IT'S JUST capitalInput points to input
+
+    int i;
+    for (i = 0; i != '\0'; i++)
+    {
+        capitalInput[i] = input[i];
+    }
+    capitalInput[i] = '\0';
+
+    capitalize_ascii(capitalInput);
+    printf("Uppercased ASCII: %s", capitalInput);
 
     //utf8_bytelen()
     printf("Length in bytes: %d\n", utf8_bytelen(input));
@@ -300,6 +307,24 @@ int main()
         printf("%d ", width);
         i += width;
     }
+    printf("\n");
 
+    //utf8_substring()
+    char subString[] = "";
+    utf8_substring(input, 0, 6, subString);
+    printf("Substring of the first %d code points: \"%s\" \n", 6, subString);
+
+    printf("INPUT STRING AFTER SUBSTRING: %s\n", input);
+
+    //codepoint_at()
+    printf("Code points as decimal numbers: ");
+    for (int i = 0; input[i] != '\0'; i++)
+    {
+        int width = width_from_start_bytes(input[i]);
+        int code = codepoint_at(input, i);
+        printf("%d ", code);
+        //i += width;
+    }
+    printf("\n");
     return 0;
 }
