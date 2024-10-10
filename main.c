@@ -309,6 +309,8 @@ int main()
     }
     printf("\n");
 
+
+    //// TESTING IN PROGRESS HERE:
     //utf8_substring()
     char subString[] = "";
     utf8_substring(input, 0, 6, subString);
