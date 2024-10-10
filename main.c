@@ -6,7 +6,7 @@
 // @param: unsigned char --- so it can go from range [0,255] instead of regular [-128,127]
 // @return: 0 : False, 1 : True.
 //
-int32_t is_ascii(unsigned char str[])
+int32_t is_ascii(unsigned const char str[])
 {
     for (int i = 0; str[i] != '\0'; i++)
     {
@@ -70,7 +70,6 @@ int32_t width_from_start_bytes(unsigned char start_byte)
     //Continuation bytes or multi bytes will always start with 0b10xxxxxx
     else if ((start_byte & 0b11000000) == 0b10000000)
     {
-
         return -1;
     }
 
@@ -81,7 +80,7 @@ int32_t width_from_start_bytes(unsigned char start_byte)
 
 // This function will return the length of the UTF-8 string CORRECTLY
 // @param: UTF-8 string 
-// @return: length of it
+// @return: codepoint-length of it
 //
 int32_t utf8_strlen(char str[])
 {
@@ -95,7 +94,7 @@ int32_t utf8_strlen(char str[])
         i += width_from_start_bytes(str[i]);
     }
 
-    return counter;
+    return counter - 1; // EXCLUDING NULL TERMINATOR
 }
 
 // This function will convert codepoint_index_to_byte_index
@@ -149,7 +148,6 @@ void utf8_substring(char str[], int32_t cpi_start, int32_t cpi_end, char result[
     int index = 0;
 
     //This loop will copy the indicated bytes into result[]
-    ///LOGIC ERROR: MEMORY CONTROLS
     for (int i = byteStart; i < byteEnd; i++)
     {
         result[index] = str[i];
@@ -164,6 +162,7 @@ void utf8_substring(char str[], int32_t cpi_start, int32_t cpi_end, char result[
 // and returns a decimal representing the codepoint at that index.
 // @param: string, codepointindex
 // @return: decimal represent codepoint at index.
+// ONLY RETURNS ASCII.
 int32_t codepoint_at(char str[], int32_t cpi)
 {
     int codePointIterator = 0;
@@ -185,7 +184,7 @@ int32_t codepoint_at(char str[], int32_t cpi)
         }
     }
 
-    return 0;
+    return -1;
 }
 
 // Takes a UTF-8 encoded string and an codepoint index, and returns if the code point at that index is an animal emoji.
@@ -194,7 +193,10 @@ int32_t codepoint_at(char str[], int32_t cpi)
 // NOT WORKING
 int is_animal_emoji_at(char str[], int32_t cpi)
 {
+    // Let's say, codePoint somehow able to extract binary from UTF-8,
+    // then this gonna work, hypothetically.
     int codePoint = codepoint_at(str, cpi);
+
 
     ///LOGIC ERROR: THE CONDITION NEVER GETS EXECUTED
     return ((codePoint >= 0b00011111010000000000000000000000 && codePoint <= 0b00011111010000111111) ||  // NESTED LIST OF EMOJI BASE ON
@@ -202,12 +204,31 @@ int is_animal_emoji_at(char str[], int32_t cpi)
 
 }
 
+
+// This function will takes in a UTF-8 string,
+// and return the bytes length.
+// @param: UTF-8 string
+// @return: int byte-length.
+//
+int utf8_bytelen(char str[])
+{
+    int i = 0;
+    for (i; str[i] != '\0';)
+    {
+        int width = width_from_start_bytes(str[i]);
+        i += width;
+    }
+
+    return i - 1; // EXCLUDING NULL TERMINATOR
+}
+
 int main()
 {
+    /*
     //substring() test
     char result[17];
     char newS[] = "🦀🦮🦮🦀🦀🦮🦮";
-    utf8_substring(newS, 3, 7, result);
+    utf8_substring(newS, 0, 1, result);
     printf("String: %s\nSubstring: %s\n", newS, result); // these emoji are 4 bytes long
 
     //animal_emoji() test
@@ -217,8 +238,38 @@ int main()
 
     //codepoint_at() test
     char str1[] = "Joséph";
-    idx = 1;
+    idx = 4;
     printf("Codepoint at %d in %s is %d\n", idx, str1, codepoint_at(str1, idx)); // 'p' is the 4th codepoint
+    */
+
+    /// UTF-8 Analyzer
+
+    printf("Enter a UTF-8 encoded string: ");
+
+    char input[50];
+    fgets(input,50, stdin);
+
+    // is_ascii()
+    printf("Valid ASCII: %s\n", is_ascii(input) ? "true" : "false");
+
+    //Uppercase
+    capitalize_ascii(input);
+    printf("Uppercased ASCII: %s", input);
+
+    //utf8_bytelen()
+    printf("Length in bytes: %d\n", utf8_bytelen(input));
+
+    //utf_strlen()
+    printf("Number of code points: %d\n", utf8_strlen(input));
+
+    //width_from_start_bytes()
+    printf("Bytes per code points: ");
+    for (int i = 0; i != '\0';)
+    {
+        int width = width_from_start_bytes(input[i]);
+        printf("%d ", width);
+        i += width;
+    }
 
     return 0;
 }
