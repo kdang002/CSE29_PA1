@@ -40,7 +40,7 @@ int32_t capitalize_ascii(char str[])
 }
 
 // This function will return the width of how many bytes a UTF-8 takes up
-// @param: a char 
+// @param: a char (ASCII OR UTF-8)
 // @return: width of how bytes
 //
 int32_t width_from_start_bytes(unsigned char start_byte)
@@ -162,46 +162,79 @@ void utf8_substring(char str[], int32_t cpi_start, int32_t cpi_end, char result[
 // and returns a decimal representing the codepoint at that index.
 // @param: string, codepointindex
 // @return: decimal represent codepoint at index.
-// ONLY RETURNS ASCII.
 int32_t codepoint_at(char str[], int32_t cpi)
 {
-    int codePointIterator = 0;
-    int byteIterator = 0;
+    int byteIndex = codepoint_index_to_byte_index(str, cpi);
+    
+    if (byteIndex == -1)
+        return -1;
 
-    while (str[byteIterator] != '\0')
+    // GET START BYTE
+    unsigned char c1 = (unsigned char)str[byteIndex];
+    int width = width_from_start_bytes(c1);
+
+    /// REFER TO WEEK 2 MONDAY - ANNOTATED NOTES
+    /// on how to convert to UTF-8 exact value.
+    switch (width)
     {
-        int width = width_from_start_bytes((unsigned char)str[byteIterator]);
-        if (width == -1)
-            return -1;
+    case 1:
+        return c1;
+        break;
+    
+    case 2:
+    {
+        unsigned char c2 = (unsigned char)str[byteIndex+1];
+        return (c1 & 0b00011111) * 64 + (c2 & 0b00111111);
+        break;
+    }
+        
 
-        byteIterator += width;
-        codePointIterator++;
+    case 3:
+    {
+        unsigned char c2 = (unsigned char)str[byteIndex+1];
+        unsigned char c3 = (unsigned char)str[byteIndex+2];
 
-        if (codePointIterator == cpi)
-        {
-            //CHECK FOR THE CASE WHEN CPI is UTF, DOESN'T RETURN -1
-            return str[byteIterator]; // SHOULD RETURN AT BYTE ITERATOR TO PREVENT WRONG MEMORY.
-        }
+        return (c1 & 0b00001111) * 4096 + (c2 & 0b00111111) * 64 + (c3 & 0b00111111);
+        break;
+
     }
 
-    return -1;
+    case 4:
+    {
+        unsigned char c2 = (unsigned char)str[byteIndex+1];
+        unsigned char c3 = (unsigned char)str[byteIndex+2];
+        unsigned char c4 = (unsigned char)str[byteIndex+3];
+
+        return (c1 & 0b00000111) * 262144 + (c2 & 0b00111111) * 4096 
+        + (c3 & 0b00111111) * 64 + (c4 & 0b00111111);
+        break;
+    }
+        
+    default:
+        return -1;
+        break;
+    }
 }
+
 
 // Takes a UTF-8 encoded string and an codepoint index, and returns if the code point at that index is an animal emoji.
 // @param: UTF-8 string, codePointIndex
 // @return: 1 : TRUE, 0 : FALSE
 // NOT WORKING
-int is_animal_emoji_at(char str[], int32_t cpi)
+char is_animal_emoji_at(char str[], int32_t cpi)
 {
     // Let's say, codePoint somehow able to extract binary from UTF-8,
     // then this gonna work, hypothetically.
     int codePoint = codepoint_at(str, cpi);
+    
+    // NESTED LIST OF EMOJI BASE ON WIKI PAGE
+    // Comparing the exact value to hex value (which will automatically converted)
+    if ((codePoint >= 0x1F400 && codePoint <= 0x1F43F) || (codePoint >= 0x1F980 && codePoint <= 0x1F99E))
+    {
+        return 1;
+    }
 
-
-    ///LOGIC ERROR: THE CONDITION NEVER GETS EXECUTED
-    return ((codePoint >= 0b00011111010000000000000000000000 && codePoint <= 0b00011111010000111111) ||  // NESTED LIST OF EMOJI BASE ON
-        (codePoint >= 0b00011111001001100000 && codePoint <= 0b00011111001010111110))   ;                // WIKI'S UNICODE
-
+    return 0;
 }
 
 
@@ -228,20 +261,17 @@ int main()
     //substring() test
     char result[17];
     char newS[] = "🦀🦮🦮🦀🦀🦮🦮";
-    utf8_substring(newS, 0, 1, result);
+    utf8_substring(newS, 3, 7, result);
     printf("String: %s\nSubstring: %s\n", newS, result); // these emoji are 4 bytes long
 
-    //animal_emoji() test
+    //animal_emoji() & codepoint_at()test
     char str[] = "🐀Rat";
     int32_t idx = 0;
+    int32_t idx1 = 0;
+
     printf("Codepoint index %d of %s is ANIMAL: %d\n", idx, str, is_animal_emoji_at(str, idx));
-
-    //codepoint_at() test
-    char str1[] = "Joséph";
-    idx = 4;
-    printf("Codepoint at %d in %s is %d\n", idx, str1, codepoint_at(str1, idx)); // 'p' is the 4th codepoint
+    printf("Codepoint at %d in %s is %d\n", idx, str, codepoint_at(str, idx)); // 'p' is the 4th codepoint
     */
-
     /// UTF-8 Analyzer
 
     printf("Enter a UTF-8 encoded string: ");
@@ -264,7 +294,7 @@ int main()
 
     //width_from_start_bytes()
     printf("Bytes per code points: ");
-    for (int i = 0; i != '\0';)
+    for (int i = 0; input[i] != '\0';)
     {
         int width = width_from_start_bytes(input[i]);
         printf("%d ", width);
