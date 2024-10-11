@@ -329,5 +329,31 @@ int main()
     }
     printf("\n");
 
+
+    //is_animal_emoji_at()
+    for (int i = 0; i < utf8_strlen(input); )
+    {        
+        int width = width_from_start_bytes(input[i]);
+        int is_animal = is_animal_emoji_at(input, i);
+
+        if (is_animal == 1)
+        {
+            printf("Animal emojis: ");
+
+            // This will print out all BYTES of the emoji, 
+            // where as they have 4 bytes.
+            // Therefore we need a loop to iterate through
+            // all of the bytes.
+            for (int j = 0; j < width; j++)
+            {
+                printf("%c", input[i+j]);
+            }
+            printf("\n");
+        }
+
+        i += width;
+    }
+
+
     return 0;
 }
