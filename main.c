@@ -265,7 +265,7 @@ int main()
     */
 
     /// UTF-8 Analyzer
-    printf("Enter a UTF-8 encoded string: ");
+    printf("Enter a UTF-8 encoded string: \n");
     char input[50];
     fgets(input,50, stdin);
 
