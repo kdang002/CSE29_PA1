@@ -276,10 +276,9 @@ int main()
    
     //Uppercase
     char capitalInput[strlen(input)];
-    // strcpy(capitalInput, input); // DOESN'T MAKE HARD COPY, IT'S JUST capitalInput points to input
 
     int i;
-    for (i = 0; i != '\0'; i++)
+    for (i = 0; input[i] != '\0'; i++)
     {
         capitalInput[i] = input[i];
     }
