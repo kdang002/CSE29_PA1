@@ -1,3 +1,7 @@
+// VY KIET DANG (A18531908)
+// CSE29_PA1
+// 10/07/2024
+
 #include <stdint.h>
 #include <stdio.h>
 #include <string.h>
