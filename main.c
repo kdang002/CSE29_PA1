@@ -279,17 +279,7 @@ int main()
     // is_ascii()
     printf("Valid ASCII: %s\n", is_ascii(input) ? "true" : "false");
 
-    //codepoint_at()
-    printf("Code points as decimal numbers: ");
-    for (int i = 0; input[i] != '\0'; i++)
-    {
-        int width = width_from_start_bytes(input[i]);
-        int code = codepoint_at(input, i);
-        printf("%d ", code);
-        //i += width;
-    }
-    printf("\n");
-
+   
     //Uppercase
     char capitalInput[strlen(input)];
     // strcpy(capitalInput, input); // DOESN'T MAKE HARD COPY, IT'S JUST capitalInput points to input
@@ -322,13 +312,32 @@ int main()
 
 
     //// TESTING IN PROGRESS HERE:
+    char subString[strlen(input)];
+
+    for (i = 0; i != '\0'; i++)
+    {
+        subString[i] = input[i];
+    }
+    subString[i] = '\0';
+
     //utf8_substring()
-    char subString[] = "";
     utf8_substring(input, 0, 6, subString);
     printf("Substring of the first %d code points: \"%s\" \n", 6, subString);
 
-    printf("INPUT STRING AFTER SUBSTRING: %s\n", input);
+    //printf("INPUT STRING AFTER SUBSTRING: %s\n", input);
 
     
+     //codepoint_at()
+    printf("Code points as decimal numbers: ");
+    for (int i = 0; input[i] != '\0'; i++)
+    {
+        int width = width_from_start_bytes(input[i]);
+        int code = codepoint_at(input, i);
+        printf("%d ", code);
+        //i += width;
+    }
+    printf("\n");
+
+
     return 0;
 }
