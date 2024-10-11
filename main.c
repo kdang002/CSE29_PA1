@@ -176,13 +176,11 @@ int32_t codepoint_at(char str[], int32_t cpi)
     {
     case 1:
         return c1;
-        break;
     
     case 2:
     {
         unsigned char c2 = (unsigned char)str[byteIndex+1];
         return (c1 & 0b00011111) * 64 + (c2 & 0b00111111);
-        break;
     }
         
 
@@ -192,8 +190,6 @@ int32_t codepoint_at(char str[], int32_t cpi)
         unsigned char c3 = (unsigned char)str[byteIndex+2];
 
         return (c1 & 0b00001111) * 4096 + (c2 & 0b00111111) * 64 + (c3 & 0b00111111);
-        break;
-
     }
 
     case 4:
@@ -204,12 +200,10 @@ int32_t codepoint_at(char str[], int32_t cpi)
 
         return (c1 & 0b00000111) * 262144 + (c2 & 0b00111111) * 4096 
         + (c3 & 0b00111111) * 64 + (c4 & 0b00111111);
-        break;
     }
         
     default:
         return -1;
-        break;
     }
 }
 
@@ -311,7 +305,6 @@ int main()
     printf("\n");
 
 
-    //// TESTING IN PROGRESS HERE:
     char subString[strlen(input)];
 
     for (i = 0; i != '\0'; i++)
@@ -324,12 +317,10 @@ int main()
     utf8_substring(input, 0, 6, subString);
     printf("Substring of the first %d code points: \"%s\" \n", 6, subString);
 
-    //printf("INPUT STRING AFTER SUBSTRING: %s\n", input);
+    //// TESTING IN PROGRESS HERE:
 
-    
-     //codepoint_at()
-    printf("Code points as decimal numbers: ");
-    for (int i = 0; input[i] != '\0'; i++)
+    //codepoint_at()
+    for (int i = 0; i < utf8_strlen(input); i++ )
     {
         int width = width_from_start_bytes(input[i]);
         int code = codepoint_at(input, i);
@@ -337,7 +328,6 @@ int main()
         //i += width;
     }
     printf("\n");
-
 
     return 0;
 }
