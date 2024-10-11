@@ -315,6 +315,7 @@ int main()
     printf("Substring of the first %d code points: \"%s\" \n", 6, subString);
 
     //codepoint_at()
+    printf("Code points as decimal numbers: ");
     for (int i = 0; i < utf8_strlen(input); i++ )
     {
         int width = width_from_start_bytes(input[i]);
