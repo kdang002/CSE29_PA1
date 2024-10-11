@@ -92,7 +92,7 @@ int32_t utf8_strlen(char str[])
         i += width_from_start_bytes(str[i]);
     }
 
-    return counter - 1; // EXCLUDING NULL TERMINATOR
+    return counter; // EXCLUDING NULL TERMINATOR
 }
 
 // This function will convert codepoint_index_to_byte_index
@@ -243,7 +243,7 @@ int utf8_bytelen(char str[])
         i += width;
     }
 
-    return i - 1; // EXCLUDING NULL TERMINATOR
+    return i; // EXCLUDING NULL TERMINATOR
 }
 
 int main()
@@ -263,10 +263,9 @@ int main()
     printf("Codepoint index %d of %s is ANIMAL: %d\n", idx, str, is_animal_emoji_at(str, idx));
     printf("Codepoint at %d in %s is %d\n", idx, str, codepoint_at(str, idx)); // 'p' is the 4th codepoint
     */
+
     /// UTF-8 Analyzer
-
     printf("Enter a UTF-8 encoded string: ");
-
     char input[50];
     fgets(input,50, stdin);
 
@@ -285,7 +284,7 @@ int main()
     capitalInput[i] = '\0';
 
     capitalize_ascii(capitalInput);
-    printf("Uppercased ASCII: %s", capitalInput);
+    printf("Uppercased ASCII: \"%s\"\n", capitalInput);
 
     //utf8_bytelen()
     printf("Length in bytes: %d\n", utf8_bytelen(input));
@@ -303,7 +302,7 @@ int main()
     }
     printf("\n");
 
-
+    //utf8_substring()
     char subString[strlen(input)];
 
     for (i = 0; i != '\0'; i++)
@@ -312,11 +311,8 @@ int main()
     }
     subString[i] = '\0';
 
-    //utf8_substring()
     utf8_substring(input, 0, 6, subString);
     printf("Substring of the first %d code points: \"%s\" \n", 6, subString);
-
-    //// TESTING IN PROGRESS HERE:
 
     //codepoint_at()
     for (int i = 0; i < utf8_strlen(input); i++ )
