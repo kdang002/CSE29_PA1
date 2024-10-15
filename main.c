@@ -15,7 +15,7 @@ int32_t is_ascii(unsigned const char str[])
     for (int i = 0; str[i] != '\0'; i++)
     {
         // If a character is not ASCII, immediate False.
-        if (str[i] >= 128)
+        if (str[i] > 127)
         {
             return 0;
         }
@@ -33,7 +33,7 @@ int32_t capitalize_ascii(char str[])
     int counter = 0;
     for (int i = 0; str[i] != '\0'; i++)
     {
-        if (str[i] >= 97 && str[i] <= 122)
+        if (str[i] >= 'a' && str[i] <= 'z')
         {
             str[i] = str[i] - 32;
             counter++;
@@ -109,7 +109,7 @@ int32_t codepoint_index_to_byte_index(const char str[], int32_t cpi)
     int codePointIterator = 0;
     int byteIterator = 0;
 
-    while (str[byteIterator] != '\0')
+    while (str[codePointIterator] != '\0')
     {
         int width = width_from_start_bytes((unsigned char)str[byteIterator]);
         if (width == -1)
