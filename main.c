@@ -253,9 +253,78 @@ int utf8_bytelen(char str[])
     return i;
 }
 
-void next_utf8_char(char str[], int32_t cpi, char result[])
-{
+// Helper function to decode a UTF-8 encoded character to a Unicode code point.
+int32_t decode_utf8(const unsigned char *src, int32_t *out_codepoint) {
+    if ((src[0] & 0b10000000) == 0b00000000) { // 1-byte (ASCII)
+        *out_codepoint = src[0];
+        return 1;
+    } else if ((src[0] & 0b11100000) == 0b11000000) { // 2-byte
+        *out_codepoint = ((src[0] & 0b00011111) << 6) | (src[1] & 0b00111111);
+        return 2;
+    } else if ((src[0] & 0b11110000) == 0b11100000) { // 3-byte
+        *out_codepoint = ((src[0] & 0b00001111) << 12) |
+                         ((src[1] & 0b00111111) << 6) |
+                         (src[2] & 0b00111111);
+        return 3;
+    } else if ((src[0] & 0b11111000) == 0b11110000) { // 4-byte
+        *out_codepoint = ((src[0] & 0b00000111) << 18) |
+                         ((src[1] & 0b00111111) << 12) |
+                         ((src[2] & 0b00111111) << 6) |
+                         (src[3] & 0b00111111);
+        return 4;
+    }
+    return -1; // Invalid UTF-8 start byte
+}
 
+// Helper function to encode a Unicode code point as UTF-8 and store it in dest.
+int encode_utf8(int32_t codepoint, unsigned char *dest) {
+    if (codepoint <= 0x7F) { // 1-byte (ASCII)
+        dest[0] = codepoint;
+        return 1;
+    } else if (codepoint <= 0x7FF) { // 2-byte
+        dest[0] = 0b11000000 | ((codepoint >> 6) & 0b00011111);
+        dest[1] = 0b10000000 | (codepoint & 0b00111111);
+        return 2;
+    } else if (codepoint <= 0xFFFF) { // 3-byte
+        dest[0] = 0b11100000 | ((codepoint >> 12) & 0b00001111);
+        dest[1] = 0b10000000 | ((codepoint >> 6) & 0b00111111);
+        dest[2] = 0b10000000 | (codepoint & 0b00111111);
+        return 3;
+    } else if (codepoint <= 0x10FFFF) { // 4-byte
+        dest[0] = 0b11110000 | ((codepoint >> 18) & 0b00000111);
+        dest[1] = 0b10000000 | ((codepoint >> 12) & 0b00111111);
+        dest[2] = 0b10000000 | ((codepoint >> 6) & 0b00111111);
+        dest[3] = 0b10000000 | (codepoint & 0b00111111);
+        return 4;
+    }
+    return -1; // Invalid code point
+}
+
+void next_utf8_char(char str[], int32_t cpi, char result[]) {
+    int byteIndex = codepoint_index_to_byte_index(str, cpi);
+    if (byteIndex == -1) {
+        result[0] = '\0'; // Error: invalid index
+        return;
+    }
+
+    int32_t codepoint;
+    int byteWidth = decode_utf8((unsigned char *)&str[byteIndex], &codepoint);
+    if (byteWidth == -1) {
+        result[0] = '\0'; // Error: invalid UTF-8 character
+        return;
+    }
+
+    // Increment the codepoint
+    codepoint++;
+
+    // Encode the incremented codepoint as UTF-8
+    int encodedSize = encode_utf8(codepoint, (unsigned char *)result);
+    if (encodedSize == -1) {
+        result[0] = '\0'; // Error: could not encode code point
+        return;
+    }
+
+    result[encodedSize] = '\0'; // Null-terminate the result
 }
 
 int main()
@@ -361,6 +430,12 @@ int main()
 
         i += width;
     }
+
+    char str[] = "Joséph";
+    char result[100];
+    int32_t idx = 3;
+    next_utf8_char(str, idx, result);
+    printf("Next Character of Codepoint at Index 3: %s\n",result);
 
 
     return 0;
