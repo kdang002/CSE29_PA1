@@ -255,7 +255,6 @@ void next_utf8_char(char str[], int32_t cpi, char result[])
 
 int main()
 {
-    
     /// UTF-8 Analyzer
     printf("Enter a UTF-8 encoded string: \n");
     char input[50];
