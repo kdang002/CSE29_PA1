@@ -132,7 +132,12 @@ int32_t codepoint_index_to_byte_index(const char str[], int32_t cpi)
 // @return: int byte index
 // FUNCTIONING NOW - DUE TO codepoint_index_to_byte_index()
 void utf8_substring(const char str[], int32_t cpi_start, int32_t cpi_end, char result[])
-{
+{    
+    if (cpi_start < 0 || cpi_end <= cpi_start)
+    {        
+        return;
+    }
+
     int byteStart = codepoint_index_to_byte_index(str, cpi_start);
     int byteEnd = codepoint_index_to_byte_index(str, cpi_end);
 
@@ -143,8 +148,6 @@ void utf8_substring(const char str[], int32_t cpi_start, int32_t cpi_end, char r
         return;
     }
 
-    if (cpi_start < 0 || cpi_end <= cpi_start)
-        return;
 
     int index = 0;
 
@@ -178,36 +181,36 @@ int32_t codepoint_at(char str[], int32_t cpi)
     /// on how to convert to UTF-8 exact value.
     switch (width)
     {
-    case 1:
-        return c1;
-    
-    case 2:
-    {
-        unsigned char c2 = (unsigned char)str[byteIndex+1];
-        return (c1 & 0b00011111) * 64 + (c2 & 0b00111111);
-    }
+        case 1:
+            return c1;
         
+        case 2:
+        {
+            unsigned char c2 = (unsigned char)str[byteIndex+1];
+            return (c1 & 0b00011111) * 64 + (c2 & 0b00111111);
+        }
+            
 
-    case 3:
-    {
-        unsigned char c2 = (unsigned char)str[byteIndex+1];
-        unsigned char c3 = (unsigned char)str[byteIndex+2];
+        case 3:
+        {
+            unsigned char c2 = (unsigned char)str[byteIndex+1];
+            unsigned char c3 = (unsigned char)str[byteIndex+2];
 
-        return (c1 & 0b00001111) * 4096 + (c2 & 0b00111111) * 64 + (c3 & 0b00111111);
-    }
+            return (c1 & 0b00001111) * 4096 + (c2 & 0b00111111) * 64 + (c3 & 0b00111111);
+        }
 
-    case 4:
-    {
-        unsigned char c2 = (unsigned char)str[byteIndex+1];
-        unsigned char c3 = (unsigned char)str[byteIndex+2];
-        unsigned char c4 = (unsigned char)str[byteIndex+3];
+        case 4:
+        {
+            unsigned char c2 = (unsigned char)str[byteIndex+1];
+            unsigned char c3 = (unsigned char)str[byteIndex+2];
+            unsigned char c4 = (unsigned char)str[byteIndex+3];
 
-        return (c1 & 0b00000111) * 262144 + (c2 & 0b00111111) * 4096 
-        + (c3 & 0b00111111) * 64 + (c4 & 0b00111111);
-    }
-        
-    default:
-        return -1;
+            return (c1 & 0b00000111) * 262144 + (c2 & 0b00111111) * 4096 
+            + (c3 & 0b00111111) * 64 + (c4 & 0b00111111);
+        }
+            
+        default:
+            return -1;
     }
 }
 
@@ -247,7 +250,12 @@ int utf8_bytelen(char str[])
         i += width;
     }
 
-    return i; // EXCLUDING NULL TERMINATOR
+    return i;
+}
+
+void next_utf8_char(char str[], int32_t cpi, char result[])
+{
+
 }
 
 int main()
