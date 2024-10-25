@@ -9,7 +9,6 @@
 // This function will check if the string is proper ASCII or not.
 // @param: unsigned char --- so it can go from range [0,255] instead of regular [-128,127]
 // @return: 0 : False, 1 : True.
-//
 int32_t is_ascii(unsigned const char str[])
 {
     for (int i = 0; str[i] != '\0'; i++)
@@ -27,7 +26,6 @@ int32_t is_ascii(unsigned const char str[])
 // This function will capitalized all characters
 // @param: a string 
 // @return: how many characters capitalized
-//
 int32_t capitalize_ascii(char str[])
 {
     int counter = 0;
@@ -46,7 +44,6 @@ int32_t capitalize_ascii(char str[])
 // This function will return the width of how many bytes a UTF-8 takes up
 // @param: a char (ASCII OR UTF-8)
 // @return: width of how bytes
-//
 int32_t width_from_start_bytes(unsigned char start_byte)
 {
     //For ASCII, isolate first bit and check start byte is 0b0xxxxxxx
@@ -83,7 +80,6 @@ int32_t width_from_start_bytes(unsigned char start_byte)
 // This function will return the length of the UTF-8 string CORRECTLY
 // @param: UTF-8 string 
 // @return: codepoint-length of it
-//
 int32_t utf8_strlen(char str[])
 {
     int counter = 0;
@@ -102,7 +98,6 @@ int32_t utf8_strlen(char str[])
 // This function will convert codepoint_index_to_byte_index
 // @param: UTF-8 string, codepoint index (cpi)
 // @return: int byte index
-//
 int32_t codepoint_index_to_byte_index(const char str[], int32_t cpi)
 {
     
@@ -130,7 +125,6 @@ int32_t codepoint_index_to_byte_index(const char str[], int32_t cpi)
 // This function will return a substring
 // @param: UTF-8 string, codepoint index (cpi)
 // @return: int byte index
-// FUNCTIONING NOW - DUE TO codepoint_index_to_byte_index()
 void utf8_substring(const char str[], int32_t cpi_start, int32_t cpi_end, char result[])
 {    
     if (cpi_start < 0 || cpi_end <= cpi_start)
@@ -218,7 +212,6 @@ int32_t codepoint_at(char str[], int32_t cpi)
 // Takes a UTF-8 encoded string and an codepoint index, and returns if the code point at that index is an animal emoji.
 // @param: UTF-8 string, codePointIndex
 // @return: 1 : TRUE, 0 : FALSE
-// NOT WORKING
 char is_animal_emoji_at(char str[], int32_t cpi)
 {
     // Let's say, codePoint somehow able to extract binary from UTF-8,
@@ -240,7 +233,6 @@ char is_animal_emoji_at(char str[], int32_t cpi)
 // and return the bytes length.
 // @param: UTF-8 string
 // @return: int byte-length.
-//
 int utf8_bytelen(char str[])
 {
     int i = 0;
@@ -253,98 +245,17 @@ int utf8_bytelen(char str[])
     return i;
 }
 
-// Helper function to decode a UTF-8 encoded character to a Unicode code point.
-int32_t decode_utf8(const unsigned char *src, int32_t *out_codepoint) {
-    if ((src[0] & 0b10000000) == 0b00000000) { // 1-byte (ASCII)
-        *out_codepoint = src[0];
-        return 1;
-    } else if ((src[0] & 0b11100000) == 0b11000000) { // 2-byte
-        *out_codepoint = ((src[0] & 0b00011111) << 6) | (src[1] & 0b00111111);
-        return 2;
-    } else if ((src[0] & 0b11110000) == 0b11100000) { // 3-byte
-        *out_codepoint = ((src[0] & 0b00001111) << 12) |
-                         ((src[1] & 0b00111111) << 6) |
-                         (src[2] & 0b00111111);
-        return 3;
-    } else if ((src[0] & 0b11111000) == 0b11110000) { // 4-byte
-        *out_codepoint = ((src[0] & 0b00000111) << 18) |
-                         ((src[1] & 0b00111111) << 12) |
-                         ((src[2] & 0b00111111) << 6) |
-                         (src[3] & 0b00111111);
-        return 4;
-    }
-    return -1; // Invalid UTF-8 start byte
-}
 
-// Helper function to encode a Unicode code point as UTF-8 and store it in dest.
-int encode_utf8(int32_t codepoint, unsigned char *dest) {
-    if (codepoint <= 0x7F) { // 1-byte (ASCII)
-        dest[0] = codepoint;
-        return 1;
-    } else if (codepoint <= 0x7FF) { // 2-byte
-        dest[0] = 0b11000000 | ((codepoint >> 6) & 0b00011111);
-        dest[1] = 0b10000000 | (codepoint & 0b00111111);
-        return 2;
-    } else if (codepoint <= 0xFFFF) { // 3-byte
-        dest[0] = 0b11100000 | ((codepoint >> 12) & 0b00001111);
-        dest[1] = 0b10000000 | ((codepoint >> 6) & 0b00111111);
-        dest[2] = 0b10000000 | (codepoint & 0b00111111);
-        return 3;
-    } else if (codepoint <= 0x10FFFF) { // 4-byte
-        dest[0] = 0b11110000 | ((codepoint >> 18) & 0b00000111);
-        dest[1] = 0b10000000 | ((codepoint >> 12) & 0b00111111);
-        dest[2] = 0b10000000 | ((codepoint >> 6) & 0b00111111);
-        dest[3] = 0b10000000 | (codepoint & 0b00111111);
-        return 4;
-    }
-    return -1; // Invalid code point
-}
+void next_utf8_char(char str[], int32_t cpi, char result[])
+{
+    int32_t next_char = codepoint_at(str, cpi) + 1; // Current code_point, add 1 to get next one
 
-void next_utf8_char(char str[], int32_t cpi, char result[]) {
-    int byteIndex = codepoint_index_to_byte_index(str, cpi);
-    if (byteIndex == -1) {
-        result[0] = '\0'; // Error: invalid index
-        return;
-    }
-
-    int32_t codepoint;
-    int byteWidth = decode_utf8((unsigned char *)&str[byteIndex], &codepoint);
-    if (byteWidth == -1) {
-        result[0] = '\0'; // Error: invalid UTF-8 character
-        return;
-    }
-
-    // Increment the codepoint
-    codepoint++;
-
-    // Encode the incremented codepoint as UTF-8
-    int encodedSize = encode_utf8(codepoint, (unsigned char *)result);
-    if (encodedSize == -1) {
-        result[0] = '\0'; // Error: could not encode code point
-        return;
-    }
-
-    result[encodedSize] = '\0'; // Null-terminate the result
+    result[0] = next_char;
 }
 
 int main()
 {
-    /*
-    //substring() test
-    char result[17];
-    char newS[] = "🦀🦮🦮🦀🦀🦮🦮";
-    utf8_substring(newS, 3, 7, result);
-    printf("String: %s\nSubstring: %s\n", newS, result); // these emoji are 4 bytes long
-
-    //animal_emoji() & codepoint_at()test
-    char str[] = "🐀Rat";
-    int32_t idx = 0;
-    int32_t idx1 = 0;
-
-    printf("Codepoint index %d of %s is ANIMAL: %d\n", idx, str, is_animal_emoji_at(str, idx));
-    printf("Codepoint at %d in %s is %d\n", idx, str, codepoint_at(str, idx)); // 'p' is the 4th codepoint
-    */
-
+    
     /// UTF-8 Analyzer
     printf("Enter a UTF-8 encoded string: \n");
     char input[50];
@@ -431,12 +342,13 @@ int main()
         i += width;
     }
 
+
+
     char str[] = "Joséph";
     char result[100];
     int32_t idx = 3;
     next_utf8_char(str, idx, result);
-    printf("Next Character of Codepoint at Index 3: %s\n",result);
-
+    printf("Next Character of Codepoint at Index 3: %s\n", result);
 
     return 0;
 }
