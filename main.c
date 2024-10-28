@@ -127,9 +127,22 @@ int32_t codepoint_index_to_byte_index(const char str[], int32_t cpi)
 // @return: int byte index
 void utf8_substring(const char str[], int32_t cpi_start, int32_t cpi_end, char result[])
 {    
-    if (cpi_start < 0 || cpi_end <= cpi_start)
+    if (cpi_start < 0)
     {        
         return;
+    }
+
+    int32_t str_length = utf8_strlen(str);
+    
+    if (cpi_end > str_length)
+    {
+	cpi_end = str_length;
+    }
+
+    if (cpi_end <= cpi_start)
+    {
+	result[0] = '\0';
+	return;
     }
 
     int byteStart = codepoint_index_to_byte_index(str, cpi_start);
